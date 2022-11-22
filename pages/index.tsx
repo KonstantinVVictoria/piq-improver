@@ -35,6 +35,8 @@ export default function Home() {
               border: "1px solid white",
               marginRight: "1rem",
               gap: "1rem",
+              height: "40rem",
+              overflowY: "scroll",
             }}
           >
             <h3>History</h3>
