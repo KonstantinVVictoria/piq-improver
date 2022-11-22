@@ -4,6 +4,8 @@ import styles from "../styles/Home.module.css";
 import { TextArea } from "../components/TextArea/TextArea";
 import { useState } from "react";
 import { Revisions } from "../components/Revisions/Revision";
+import ReactLoading from "react-loading";
+
 export default function Home() {
   const [revisions, setRevisions] = useState([]);
   const RevisionsArray = revisions.map((element, i) => (
@@ -47,6 +49,14 @@ export default function Home() {
               title={"Enter your PIQ a single paragraph from your PIQ:"}
               word_count_max={350}
             />
+            <div id="loader" style={{ margin: "1rem", display: "none" }}>
+              <ReactLoading
+                type={"spinningBubbles"}
+                color={"white"}
+                height={"3rem"}
+                width={"3rem"}
+              />
+            </div>
             <div style={{ display: "flex", gap: "1rem" }}>
               <button id="feedback_button" onClick={get_feedback}>
                 Get feedback
@@ -81,6 +91,7 @@ export default function Home() {
 }
 
 async function get_feedback() {
+  const loader = document.getElementById("loader");
   const piq_question_element = document.getElementById(
     "question"
   ) as HTMLInputElement;
@@ -88,11 +99,11 @@ async function get_feedback() {
     `textarea_output`
   ) as HTMLTextAreaElement;
   const feedback = document.getElementById("feedback");
-  if (!(piq_question_element && writing_element && feedback)) return;
+  if (!(piq_question_element && writing_element && feedback && loader)) return;
 
   const piq_question = piq_question_element.value;
   const writing = writing_element.value;
-
+  loader.style.display = "";
   const { data } = await fetch("api/feedback", {
     method: "POST",
     mode: "cors",
@@ -101,10 +112,12 @@ async function get_feedback() {
     },
     body: JSON.stringify({ piq: piq_question, writing: writing }),
   }).then((req) => req.json());
+  loader.style.display = "none";
   feedback.textContent = data.replace("\n", "");
 }
 
 async function revise(setRevisions: Function, revisions: [string] | never[]) {
+  const loader = document.getElementById("loader");
   const revision = document.getElementById("is_revised");
   const feedback = document.getElementById("feedback")?.textContent;
   const writing_element = document.getElementById(
@@ -118,6 +131,7 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
   setRevisions(newArray);
   writing_element.style.display = "none";
   if (revision) revision.innerText = "Revising";
+  if (loader) loader.style.display = "";
   const { data } = await fetch("api/revise", {
     method: "POST",
     mode: "cors",
@@ -126,6 +140,7 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
     },
     body: JSON.stringify({ feedback: feedback, writing: writing }),
   }).then((req) => req.json());
+  if (loader) loader.style.display = "none";
   if (writing_element && writing_element?.value)
     writing_element.value = data.replace("\n", "").replace("\n", "");
   writing_element.style.display = "";
