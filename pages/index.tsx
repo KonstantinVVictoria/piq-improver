@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Revisions } from "../components/Revisions/Revision";
 export default function Home() {
   const [revisions, setRevisions] = useState([]);
-  const RevisionsArray = revisions.map((element) => (
-    <Revisions text={element} />
+  const RevisionsArray = revisions.map((element, i) => (
+    <Revisions key={i + "_revision"} text={element} />
   ));
   return (
     <div className={styles.container}>
