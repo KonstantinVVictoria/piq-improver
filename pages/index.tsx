@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
+import { TextArea } from "../components/TextArea/TextArea";
 export default function Home() {
   return (
     <div className={styles.container}>
@@ -12,46 +12,23 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <TextArea
+          size={["27rem", "27rem"]}
+          name="input"
+          placeholder={"Put your text in here"}
+          title={"Enter your PIQ a single paragraph from your PIQ:"}
+          character_count_max={100}
+        />
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <button id="feedback_button" onClick={get_feedback}>
+            Get feedback
+          </button>
+          <button id="revision_button" onClick={revise}>
+            Revise
+          </button>
         </div>
+        <h1>Feedback</h1>
+        <p id="feedback" style={{ width: "27rem" }}></p>
       </main>
 
       <footer className={styles.footer}>
@@ -60,12 +37,58 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
+  );
+}
+
+async function get_feedback() {
+  const piq_question_element = document.getElementById(
+    "question"
+  ) as HTMLInputElement;
+  const writing_element = document.getElementById(
+    `textarea_output`
+  ) as HTMLTextAreaElement;
+  const feedback = document.getElementById("feedback");
+  if (!(piq_question_element && writing_element && feedback)) return;
+
+  const piq_question = piq_question_element.value;
+  const writing = writing_element.value;
+
+  const { data } = await fetch("api/feedback", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ piq: piq_question, writing: writing }),
+  }).then((req) => req.json());
+  feedback.textContent = data.replace("\n", "");
+}
+
+async function revise() {
+  const feedback = document.getElementById("feedback")?.textContent;
+  const writing_element = document.getElementById(
+    `textarea_output`
+  ) as HTMLTextAreaElement;
+  if (writing_element === undefined) return;
+  const writing = writing_element.value;
+
+  const { data } = await fetch("api/revise", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ feedback: feedback, writing: writing }),
+  }).then((req) => req.json());
+  if (writing_element && writing_element?.value)
+    writing_element.value = data.replace("\n", "").replace("\n", "");
+  const revision = document.getElementById("is_revised");
+  if (revision) revision.style.display = "";
 }
