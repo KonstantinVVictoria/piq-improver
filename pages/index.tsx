@@ -33,6 +33,7 @@ export default function Home() {
               gap: "1rem",
             }}
           >
+            <h3>History</h3>
             {RevisionsArray}
           </div>
           <div
@@ -64,6 +65,7 @@ export default function Home() {
               <button
                 id="revision_button"
                 onClick={() => revise(setRevisions, revisions)}
+                style={{ display: "none" }}
               >
                 Revise
               </button>
@@ -91,6 +93,7 @@ export default function Home() {
 }
 
 async function get_feedback() {
+  const revision = document.getElementById("is_revised");
   const loader = document.getElementById("loader");
   const piq_question_element = document.getElementById(
     "question"
@@ -112,6 +115,11 @@ async function get_feedback() {
     },
     body: JSON.stringify({ piq: piq_question, writing: writing }),
   }).then((req) => req.json());
+  const revision_button = document.getElementById("revision_button");
+
+  if (revision_button && revision_button.style.display === "none")
+    revision_button.style.display = "";
+
   loader.style.display = "none";
   feedback.textContent = data.replace("\n", "");
 }
@@ -130,6 +138,7 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
   const newArray = [...revisions, writing];
   setRevisions(newArray);
   writing_element.style.display = "none";
+
   if (revision) revision.innerText = "Revising";
   if (loader) loader.style.display = "";
   const { data } = await fetch("api/revise", {
@@ -144,6 +153,7 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
   if (writing_element && writing_element?.value)
     writing_element.value = data.replace("\n", "").replace("\n", "");
   writing_element.style.display = "";
+
   if (revision) {
     revision.innerText = "Revised";
     revision.style.display = "";

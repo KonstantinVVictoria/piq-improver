@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/revise.js": {
+      "maxDuration": 30
+    }
+  }
+}
