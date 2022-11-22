@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/revise.ts": {
+    "src/pages/api.revise.ts": {
       "maxDuration": 30
     }
   }
