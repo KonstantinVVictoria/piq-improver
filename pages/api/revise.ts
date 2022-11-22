@@ -15,11 +15,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const completion = await openai.createCompletion({
+  console.log(req.body.feedback);
+  const corrected_version = await openai.createCompletion({
     model: "text-davinci-002",
-    prompt: `Rewrite the following passage given the feedback\nFeedback:\n${req.body.feedback}\nPassage:\n${req.body.writing}\n\nRewrite:\n`,
+    prompt: `Rewrite the passage with better prose and correct grammar.\n\nPassage:\n${req.body.writing}\n\nRewrite The Passage:`,
     temperature: 0.6,
     max_tokens: 1000,
   });
-  res.status(200).json({ data: completion.data.choices[0].text });
+  const revision = await openai.createCompletion({
+    model: "text-davinci-002",
+    prompt: `Rewrite the passage given the feedback provided.\n\nPassage:\n${corrected_version.data.choices[0].text}\n\nFeedback:\n${req.body.feedback}\\n\nRewrite The Passage:`,
+    temperature: 0.6,
+    max_tokens: 1000,
+  });
+  res.status(200).json({ data: revision.data.choices[0].text });
 }

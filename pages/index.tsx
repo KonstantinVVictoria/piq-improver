@@ -37,10 +37,14 @@ export default function Home() {
               gap: "1rem",
               height: "40rem",
               overflowY: "scroll",
+              flexGrow: 1,
+              flexBasis: 0,
             }}
           >
-            <h3>History</h3>
-            {RevisionsArray}
+            <div>
+              <h3>History</h3>
+              {RevisionsArray}
+            </div>
           </div>
           <div
             style={{
@@ -92,6 +96,12 @@ export default function Home() {
 }
 
 async function get_feedback() {
+  const revision_button = document.getElementById(
+    "revision_button"
+  ) as HTMLButtonElement;
+  const feedback_button = document.getElementById(
+    "feedback_button"
+  ) as HTMLButtonElement;
   const loader = document.getElementById("loader");
   const piq_question_element = document.getElementById(
     "question"
@@ -106,6 +116,12 @@ async function get_feedback() {
   const writing = writing_element.value;
   if (writing === "") return;
   loader.style.display = "";
+  if (revision_button) {
+    revision_button.disabled = true;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = true;
+  }
   const { data } = await fetch("api/feedback", {
     method: "POST",
     mode: "cors",
@@ -114,8 +130,12 @@ async function get_feedback() {
     },
     body: JSON.stringify({ piq: piq_question, writing: writing }),
   }).then((req) => req.json());
-  const revision_button = document.getElementById("revision_button");
-
+  if (revision_button) {
+    revision_button.disabled = false;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = false;
+  }
   if (revision_button && revision_button.style.display === "none")
     revision_button.style.display = "";
 
@@ -127,6 +147,12 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
   const loader = document.getElementById("loader");
   const revision = document.getElementById("is_revised");
   const feedback = document.getElementById("feedback")?.textContent;
+  const revision_button = document.getElementById(
+    "revision_button"
+  ) as HTMLButtonElement;
+  const feedback_button = document.getElementById(
+    "feedback_button"
+  ) as HTMLButtonElement;
   const writing_element = document.getElementById(
     `textarea_output`
   ) as HTMLTextAreaElement;
@@ -140,6 +166,12 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
 
   if (revision) revision.innerText = "Revising";
   if (loader) loader.style.display = "";
+  if (revision_button) {
+    revision_button.disabled = true;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = true;
+  }
   const { data } = await fetch("api/revise", {
     method: "POST",
     mode: "cors",
@@ -148,6 +180,12 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
     },
     body: JSON.stringify({ feedback: feedback, writing: writing }),
   }).then((req) => req.json());
+  if (revision_button) {
+    revision_button.disabled = false;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = false;
+  }
   if (loader) loader.style.display = "none";
   if (writing_element && writing_element?.value)
     writing_element.value = data.replace("\n", "").replace("\n", "");
