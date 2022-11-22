@@ -3,7 +3,7 @@ interface Properties {
   size: [string, string];
   title: string;
   placeholder: string;
-  character_count_max: number;
+  word_count_max: number;
 }
 
 export const TextArea = ({
@@ -11,7 +11,7 @@ export const TextArea = ({
   size = ["27rem", "27rem"],
   title,
   placeholder,
-  character_count_max,
+  word_count_max,
 }: Properties) => {
   return (
     <>
@@ -26,9 +26,9 @@ export const TextArea = ({
         style={{ width: size[0], height: size[1] }}
         title={`textarea_${name}`}
         placeholder={placeholder}
-        onKeyUp={update_count(character_count_max)}
+        onKeyUp={update_count(word_count_max)}
       />
-      <p id="character_count">Word count = 0/ {character_count_max}</p>
+      <p id="character_count">Word count = 0/ {word_count_max}</p>
     </>
   );
 };

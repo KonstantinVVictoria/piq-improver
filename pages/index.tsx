@@ -45,7 +45,7 @@ export default function Home() {
               name="input"
               placeholder={"Put your text in here"}
               title={"Enter your PIQ a single paragraph from your PIQ:"}
-              character_count_max={100}
+              word_count_max={350}
             />
             <div style={{ display: "flex", gap: "1rem" }}>
               <button id="feedback_button" onClick={get_feedback}>
