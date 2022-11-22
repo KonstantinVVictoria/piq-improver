@@ -2,7 +2,13 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { TextArea } from "../components/TextArea/TextArea";
+import { useState } from "react";
+import { Revisions } from "../components/Revisions/Revision";
 export default function Home() {
+  const [revisions, setRevisions] = useState([]);
+  const RevisionsArray = revisions.map((element) => (
+    <Revisions text={element} />
+  ));
   return (
     <div className={styles.container}>
       <Head>
@@ -12,23 +18,50 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <TextArea
-          size={["27rem", "27rem"]}
-          name="input"
-          placeholder={"Put your text in here"}
-          title={"Enter your PIQ a single paragraph from your PIQ:"}
-          character_count_max={100}
-        />
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <button id="feedback_button" onClick={get_feedback}>
-            Get feedback
-          </button>
-          <button id="revision_button" onClick={revise}>
-            Revise
-          </button>
-        </div>
-        <h1>Feedback</h1>
-        <p id="feedback" style={{ width: "27rem" }}></p>
+        <section style={{ display: "flex" }}>
+          <div
+            id="side-bar"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "15rem",
+              border: "1px solid white",
+              marginRight: "1rem",
+              gap: "1rem",
+            }}
+          >
+            {RevisionsArray}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <TextArea
+              size={["27rem", "27rem"]}
+              name="input"
+              placeholder={"Put your text in here"}
+              title={"Enter your PIQ a single paragraph from your PIQ:"}
+              character_count_max={100}
+            />
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button id="feedback_button" onClick={get_feedback}>
+                Get feedback
+              </button>
+              <button
+                id="revision_button"
+                onClick={() => revise(setRevisions, revisions)}
+              >
+                Revise
+              </button>
+            </div>
+            <h1>Feedback</h1>
+            <p id="feedback" style={{ width: "27rem" }}></p>
+          </div>
+        </section>
       </main>
 
       <footer className={styles.footer}>
@@ -71,14 +104,20 @@ async function get_feedback() {
   feedback.textContent = data.replace("\n", "");
 }
 
-async function revise() {
+async function revise(setRevisions: Function, revisions: [string] | never[]) {
+  const revision = document.getElementById("is_revised");
   const feedback = document.getElementById("feedback")?.textContent;
   const writing_element = document.getElementById(
     `textarea_output`
   ) as HTMLTextAreaElement;
+
   if (writing_element === undefined) return;
   const writing = writing_element.value;
 
+  const newArray = [...revisions, writing];
+  setRevisions(newArray);
+  writing_element.style.display = "none";
+  if (revision) revision.innerText = "Revising";
   const { data } = await fetch("api/revise", {
     method: "POST",
     mode: "cors",
@@ -89,6 +128,9 @@ async function revise() {
   }).then((req) => req.json());
   if (writing_element && writing_element?.value)
     writing_element.value = data.replace("\n", "").replace("\n", "");
-  const revision = document.getElementById("is_revised");
-  if (revision) revision.style.display = "";
+  writing_element.style.display = "";
+  if (revision) {
+    revision.innerText = "Revised";
+    revision.style.display = "";
+  }
 }
