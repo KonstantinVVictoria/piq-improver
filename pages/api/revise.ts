@@ -17,7 +17,7 @@ export default async function handler(
 ) {
   const completion = await openai.createCompletion({
     model: "text-davinci-002",
-    prompt: `Rewrite the following passage given the feedback\n\nFeedback:\n${req.body.feedback}\n\n${req.body.writing}\n\nRevision:`,
+    prompt: `Rewrite the following passage given the feedback\nFeedback:\n${req.body.feedback}\nPassage:\n${req.body.writing}\n\nRewrite:\n`,
     temperature: 0.6,
     max_tokens: 1000,
   });
