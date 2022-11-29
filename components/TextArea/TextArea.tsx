@@ -1,3 +1,4 @@
+import styles from "./TextArea.module.css";
 interface Properties {
   name: string;
   size: [string, string];
@@ -15,7 +16,7 @@ export const TextArea = ({
 }: Properties) => {
   return (
     <>
-      <h1>{"PIQ Question:"}</h1>
+      <h1 className={styles.Header}>PIQ Question:</h1>
       <input id="question" style={{ width: size[0] }} />
       <h1>{title}</h1>
       <h1 id="is_revised" style={{ display: "none" }}>

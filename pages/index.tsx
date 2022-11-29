@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { TextArea } from "../components/TextArea/TextArea";
 import { useState } from "react";
@@ -12,6 +11,7 @@ export default function Home() {
   const RevisionsArray = revisions.map((element, i) => (
     <Revisions key={i + "_revision"} text={element} />
   ));
+
   return (
     <div className={styles.container}>
       <Head>
@@ -24,7 +24,7 @@ export default function Home() {
         <h1>PIQ Feedback</h1>
       </footer>
       <main className={styles.main}>
-        <section style={{ display: "flex" }}>
+        <section className={styles.program}>
           <div
             id="side-bar"
             style={{
@@ -78,6 +78,12 @@ export default function Home() {
                 style={{ display: "none" }}
               >
                 Revise
+              </button>
+              <button
+                id="spell-grammar_check"
+                onClick={() => spell_grammar_check(setRevisions, revisions)}
+              >
+                Correct Grammar and Spelling
               </button>
             </div>
             <h1>Feedback</h1>
@@ -185,6 +191,75 @@ async function revise(setRevisions: Function, revisions: [string] | never[]) {
   }
   if (feedback_button) {
     feedback_button.disabled = false;
+  }
+  if (loader) loader.style.display = "none";
+  if (writing_element && writing_element?.value)
+    writing_element.value = data.replace("\n", "").replace("\n", "");
+  writing_element.style.display = "";
+
+  if (revision) {
+    revision.innerText = "Revised";
+    revision.style.display = "";
+  }
+}
+
+async function spell_grammar_check(
+  setRevisions: Function,
+  revisions: [string] | never[]
+) {
+  const loader = document.getElementById("loader");
+  const revision = document.getElementById("is_revised");
+  const feedback = document.getElementById("feedback")?.textContent;
+  const revision_button = document.getElementById(
+    "revision_button"
+  ) as HTMLButtonElement;
+  const feedback_button = document.getElementById(
+    "feedback_button"
+  ) as HTMLButtonElement;
+  const writing_element = document.getElementById(
+    `textarea_output`
+  ) as HTMLTextAreaElement;
+  const correct_button = document.getElementById(
+    "spell-grammar_check"
+  ) as HTMLButtonElement;
+
+  if (writing_element === undefined) return;
+  const writing = writing_element.value;
+
+  const newArray = [...revisions, writing];
+  setRevisions(newArray);
+  writing_element.style.display = "none";
+
+  if (revision) revision.innerText = "Revising";
+  if (loader) loader.style.display = "";
+  if (revision_button) {
+    revision_button.disabled = true;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = true;
+  }
+  if (correct_button) {
+    correct_button.disabled = true;
+  }
+  const { data } = await fetch("api/correct", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ writing: writing }),
+  }).then((req) => req.json());
+  if (revision_button) {
+    revision_button.disabled = false;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = false;
+  }
+  if (feedback_button) {
+    feedback_button.disabled = false;
+  }
+  if (correct_button) {
+    correct_button.disabled = false;
   }
   if (loader) loader.style.display = "none";
   if (writing_element && writing_element?.value)

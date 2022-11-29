@@ -14,13 +14,32 @@ a {
 * {
   box-sizing: border-box;
 }
+::-webkit-scrollbar {
+  width: 10px;
+}
 
+/* Track */
+::-webkit-scrollbar-track {
+  background: #363636;
+  border-radius: 50px 0px 0px 50px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(136, 136, 136);
+  border-radius: 50px 0px 0px 50px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
   body {
     color: white;
-    background: black;
+    background: rgb(42, 42, 42);
   }
 }

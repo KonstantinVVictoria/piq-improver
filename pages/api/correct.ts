@@ -18,9 +18,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { writing, feedback } = req.body;
+  const { writing } = req.body;
 
-  const revision: string = await Revise(writing, feedback);
+  const corrected_writing: string = await SpellGrammarCheck(writing);
 
   let response: Data = {
     data: null,
@@ -30,9 +30,9 @@ export default async function handler(
     },
   };
 
-  if (revision !== "")
+  if (corrected_writing !== "")
     response = {
-      data: revision,
+      data: corrected_writing,
       error: {
         status: false,
         message: null,
@@ -42,15 +42,13 @@ export default async function handler(
   res.status(200).json(response);
 }
 
-async function Revise(corrected_writing: string, feedback: string) {
+async function SpellGrammarCheck(writing: string) {
   return (
     (
       await openai.createCompletion({
-        model: "text-davinci-002",
-        prompt: `Rewrite the passage given the feedback provided.\n\nPassage:\n${corrected_writing}\n\nFeedback:\n${feedback}\\n\nRewrite The Passage:`,
-        temperature: 0.8,
-        top_p: 1,
-        frequency_penalty: 0.37,
+        model: "text-curie-001",
+        prompt: `Rewrite the passage with better prose and correct grammar.\n\nPassage:\n${writing}\n\nRewrite The Passage:`,
+        temperature: 0.6,
         max_tokens: 1000,
       })
     ).data.choices[0].text || ""

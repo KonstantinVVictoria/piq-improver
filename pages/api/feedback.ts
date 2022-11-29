@@ -16,7 +16,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const completion = await openai.createCompletion({
-    model: "text-davinci-002",
+    model: "text-davinci-003",
     prompt: `How would I improve the following Personal Insight Question?\n\nPersonal Insight Question:\n${req.body.piq}\n\n${req.body.writing}\n\nFeedback:`,
     temperature: 0.6,
     max_tokens: 1000,
