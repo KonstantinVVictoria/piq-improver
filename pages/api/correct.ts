@@ -46,8 +46,8 @@ async function SpellGrammarCheck(writing: string) {
   return (
     (
       await openai.createCompletion({
-        model: "text-curie-001",
-        prompt: `Rewrite the passage with better prose and correct grammar.\n\nPassage:\n${writing}\n\nRewrite The Passage:`,
+        model: "text-davinci-003",
+        prompt: `Rewrite the passage with better quality and corrected spelling and grammar.\n\nPassage:\n${writing}\n\nRewrite The Passage:`,
         temperature: 0.6,
         max_tokens: 1000,
       })
